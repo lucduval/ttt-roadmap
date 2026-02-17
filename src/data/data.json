@@ -1,0 +1,70 @@
+{
+  "strategicAlignment": [
+    {
+      "engine": "Sales Growth",
+      "focus": "WhatsApp Engagement",
+      "metric": "Client-initiated servicing via WhatsApp (inbound)",
+      "description": "Client-initiated servicing via WhatsApp (inbound).",
+      "detailedMeasurement": "% of active clients with ≥1 inbound WhatsApp thread in-year (exclude outbound-only). Also track new-client cohort.",
+      "baseGoal": "20%",
+      "targetGoal": "30%",
+      "stretchGoal": "40%",
+      "icon": "MessageCircle",
+      "iconColor": "text-emerald-500",
+      "currentValue": 25
+    },
+    {
+      "engine": "Sales Growth",
+      "focus": "Digital Compliance",
+      "metric": "Digital signing via Quickly Sign",
+      "description": "Digital signing via Quickly Sign.",
+      "detailedMeasurement": "% of in-scope docs signed digitally within SLA (report by LOE, approval, audit, consent).",
+      "baseGoal": "60%",
+      "targetGoal": "70%",
+      "stretchGoal": "85%",
+      "icon": "CheckCircle",
+      "iconColor": "text-blue-500",
+      "currentValue": 65
+    },
+    {
+      "engine": "Product",
+      "focus": "System Adoption",
+      "metric": "Meaningful CRM usage across divisions",
+      "description": "Meaningful CRM usage across divisions.",
+      "detailedMeasurement": "% of staff 'active' based on key actions (not logins). Action set by division; Tax daily, others weekly.",
+      "baseGoal": "70%",
+      "targetGoal": "80%",
+      "stretchGoal": "90%",
+      "icon": "TrendingUp",
+      "iconColor": "text-purple-500",
+      "currentValue": 75
+    },
+    {
+      "engine": "Library",
+      "focus": "FA Lead Generation",
+      "metric": "Validated FA opportunities from data mining",
+      "description": "Validated FA opportunities from data mining.",
+      "detailedMeasurement": "# of leads surfaced by scoring rules and validated by FA team; enforce <10% duplication.",
+      "baseGoal": "700",
+      "targetGoal": "1,000",
+      "stretchGoal": "1,400",
+      "icon": "Target",
+      "iconColor": "text-red-500",
+      "currentValue": 850
+    },
+    {
+      "engine": "Efficiency",
+      "focus": "Level 1 Case Auto-resolution",
+      "metric": "Auto-close simple support cases via AI + rules",
+      "description": "Auto-close simple support cases via AI + rules.",
+      "detailedMeasurement": "% of Level 1 cases closed automatically with correct outcome; 'no response = accepted' after defined wait.",
+      "baseGoal": "35%",
+      "targetGoal": "50%",
+      "stretchGoal": "65%",
+      "icon": "Zap",
+      "iconColor": "text-yellow-500",
+      "currentValue": 40
+    }
+  ],
+  "departmentRoadmap": []
+}
