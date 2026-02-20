@@ -8,6 +8,10 @@ import {
     Settings,
     FileText,
     X,
+    LayoutDashboard,
+    ListChecks,
+    Target,
+    Flag,
 } from 'lucide-react';
 
 interface NavItemProps {
@@ -96,6 +100,32 @@ const Sidebar: React.FC<SidebarProps> = ({ activeView, setActiveView, isOpen, on
                         label="Roadmap"
                         active={activeView === 'roadmap'}
                         onClick={() => handleNavClick('roadmap')}
+                    />
+
+                    <div className="px-4 pb-2 pt-6 text-xs font-bold text-slate-500 uppercase tracking-wider">OKRs</div>
+                    <NavItem
+                        icon={<LayoutDashboard className="w-5 h-5" />}
+                        label="OKR Dashboard"
+                        active={activeView === 'okr-dashboard'}
+                        onClick={() => handleNavClick('okr-dashboard')}
+                    />
+                    <NavItem
+                        icon={<ListChecks className="w-5 h-5" />}
+                        label="Q1 Key Results"
+                        active={activeView === 'okr-q1'}
+                        onClick={() => handleNavClick('okr-q1')}
+                    />
+                    <NavItem
+                        icon={<Target className="w-5 h-5" />}
+                        label="Objectives"
+                        active={activeView === 'okr-objectives'}
+                        onClick={() => handleNavClick('okr-objectives')}
+                    />
+                    <NavItem
+                        icon={<Flag className="w-5 h-5" />}
+                        label="5-Year Targets"
+                        active={activeView === 'okr-targets'}
+                        onClick={() => handleNavClick('okr-targets')}
                     />
 
                     <div className="px-4 pb-2 pt-6 text-xs font-bold text-slate-500 uppercase tracking-wider">Product</div>

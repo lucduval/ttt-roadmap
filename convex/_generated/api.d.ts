@@ -9,6 +9,7 @@
  */
 
 import type * as metrics from "../metrics.js";
+import type * as okr from "../okr.js";
 import type * as roadmap from "../roadmap.js";
 
 import type {
@@ -19,6 +20,7 @@ import type {
 
 declare const fullApi: ApiFromModules<{
   metrics: typeof metrics;
+  okr: typeof okr;
   roadmap: typeof roadmap;
 }>;
 

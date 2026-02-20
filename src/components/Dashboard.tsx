@@ -8,8 +8,12 @@ import FeaturesView from './views/FeaturesView';
 import RoadmapView from './views/RoadmapView';
 import DocsView from './views/DocsView';
 import TechnicalSpecsView from './views/TechnicalSpecsView';
-import { StrategicMetric, Feature, Department } from '@/types';
+import { StrategicMetric, Feature, Department, FiveYearTarget, AnnualObjective, KeyResult } from '@/types';
 import { Settings, Edit3, X, Menu } from 'lucide-react';
+import OKRDashboardView from './views/OKRDashboardView';
+import OKRQ1View from './views/OKRQ1View';
+import OKRObjectivesView from './views/OKRObjectivesView';
+import OKRTargetsView from './views/OKRTargetsView';
 import Modal from './ui/Modal';
 import EditMetricForm from './forms/EditMetricForm';
 import EditFeatureForm from './forms/EditFeatureForm';
@@ -20,12 +24,16 @@ export default function Dashboard() {
     // Convex Data
     const metrics = useQuery(api.metrics.get);
     const departmentRoadmap = useQuery(api.roadmap.getExploreData);
+    const okrFiveYearTargets = useQuery(api.okr.getFiveYearTargets);
+    const okrAnnualObjectives = useQuery(api.okr.getAnnualObjectives);
+    const okrKeyResults = useQuery(api.okr.getKeyResults, {});
 
     // Mutations
     const seedMetrics = useMutation(api.metrics.seed);
     const seedRoadmap = useMutation(api.roadmap.seed);
     const seedDefaults = useMutation(api.roadmap.seedDefaults);
     const seedRoadmapFeatures = useMutation(api.roadmap.seedRoadmapFeatures);
+    const seedOKRData = useMutation(api.okr.seedOKRData);
     const addMetric = useMutation(api.metrics.add);
     const updateMetric = useMutation(api.metrics.update);
     const addFeature = useMutation(api.roadmap.addFeature);
@@ -54,6 +62,10 @@ export default function Dashboard() {
             if (departmentRoadmap !== undefined && departmentRoadmap.length === 0) {
                 await seedDefaults();
             }
+            // Seed OKR data (idempotent — guarded inside the mutation)
+            if (okrFiveYearTargets !== undefined) {
+                await seedOKRData();
+            }
             // Seed roadmap features once departments and metrics exist
             if (
                 metrics !== undefined && metrics.length > 0 &&
@@ -64,7 +76,7 @@ export default function Dashboard() {
             }
         };
         seedData();
-    }, [metrics, departmentRoadmap, seedMetrics, seedDefaults, seedRoadmapFeatures, seedAttempted]);
+    }, [metrics, departmentRoadmap, okrFiveYearTargets, seedMetrics, seedDefaults, seedRoadmapFeatures, seedOKRData, seedAttempted]);
 
 
     const handleDocClick = (docTitle: string) => {
@@ -183,13 +195,22 @@ export default function Dashboard() {
         }
     };
 
-    if (metrics === undefined || departmentRoadmap === undefined) {
+    if (
+        metrics === undefined ||
+        departmentRoadmap === undefined ||
+        okrFiveYearTargets === undefined ||
+        okrAnnualObjectives === undefined ||
+        okrKeyResults === undefined
+    ) {
         return <div className="flex h-screen items-center justify-center bg-slate-50 text-slate-400">Loading...</div>;
     }
 
     // Cast types for UI components (Convex types -> UI types)
     const uiMetrics: StrategicMetric[] = metrics.map((m: any) => ({ ...m }));
     const uiRoadmap: Department[] = departmentRoadmap.map((d: any) => ({ ...d }));
+    const uiFiveYearTargets: FiveYearTarget[] = okrFiveYearTargets.map((t: any) => ({ ...t }));
+    const uiAnnualObjectives: AnnualObjective[] = okrAnnualObjectives.map((o: any) => ({ ...o }));
+    const uiKeyResults: KeyResult[] = okrKeyResults.map((kr: any) => ({ ...kr }));
 
     return (
         <div className="flex h-screen bg-slate-50 font-sans text-slate-900 overflow-hidden">
@@ -272,6 +293,25 @@ export default function Dashboard() {
                         )}
                         {activeView === 'specs' && <TechnicalSpecsView />}
                         {activeView === 'training' && <DocsView data={uiRoadmap} type="training" />}
+                        {activeView === 'okr-dashboard' && (
+                            <OKRDashboardView
+                                keyResults={uiKeyResults}
+                                fiveYearTargets={uiFiveYearTargets}
+                                annualObjectives={uiAnnualObjectives}
+                            />
+                        )}
+                        {activeView === 'okr-q1' && (
+                            <OKRQ1View keyResults={uiKeyResults.filter((kr) => kr.quarter === 'Q1')} />
+                        )}
+                        {activeView === 'okr-objectives' && (
+                            <OKRObjectivesView
+                                annualObjectives={uiAnnualObjectives}
+                                fiveYearTargets={uiFiveYearTargets}
+                            />
+                        )}
+                        {activeView === 'okr-targets' && (
+                            <OKRTargetsView fiveYearTargets={uiFiveYearTargets} />
+                        )}
                     </div>
                 </div>
 
