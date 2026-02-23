@@ -17,6 +17,7 @@ import OKRTargetsView from './views/OKRTargetsView';
 import Modal from './ui/Modal';
 import EditMetricForm from './forms/EditMetricForm';
 import EditFeatureForm from './forms/EditFeatureForm';
+import EditKeyResultForm from './forms/EditKeyResultForm';
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
 
@@ -34,12 +35,16 @@ export default function Dashboard() {
     const seedDefaults = useMutation(api.roadmap.seedDefaults);
     const seedRoadmapFeatures = useMutation(api.roadmap.seedRoadmapFeatures);
     const seedOKRData = useMutation(api.okr.seedOKRData);
+    const seedAllOKRData = useMutation(api.okr.seedAllOKRData);
     const addMetric = useMutation(api.metrics.add);
     const updateMetric = useMutation(api.metrics.update);
     const addFeature = useMutation(api.roadmap.addFeature);
     const updateFeature = useMutation(api.roadmap.updateFeature);
     const updateFeatureDates = useMutation(api.roadmap.updateFeatureDates);
     const deleteFeatureMutation = useMutation(api.roadmap.deleteFeature);
+    const updateKeyResultMutation = useMutation(api.okr.updateKeyResult);
+    const addKeyResultMutation = useMutation(api.okr.addKeyResult);
+    const deleteKeyResultMutation = useMutation(api.okr.deleteKeyResult);
 
     const [activeView, setActiveView] = useState('overview');
     const [activeToast, setActiveToast] = useState<string | null>(null);
@@ -49,6 +54,7 @@ export default function Dashboard() {
     // Modal State
     const [metricModal, setMetricModal] = useState<{ isOpen: boolean, item?: StrategicMetric, index?: number }>({ isOpen: false });
     const [featureModal, setFeatureModal] = useState<{ isOpen: boolean, deptId?: string, feature?: Feature, featureIndex?: number }>({ isOpen: false });
+    const [keyResultModal, setKeyResultModal] = useState<{ isOpen: boolean, item?: KeyResult }>({ isOpen: false });
 
     // Initial Seeding Effect (runs once — backend is idempotent via _metadata flag)
     const [seedAttempted, setSeedAttempted] = useState(false);
@@ -65,6 +71,7 @@ export default function Dashboard() {
             // Seed OKR data (idempotent — guarded inside the mutation)
             if (okrFiveYearTargets !== undefined) {
                 await seedOKRData();
+                await seedAllOKRData();
             }
             // Seed roadmap features once departments and metrics exist
             if (
@@ -76,7 +83,8 @@ export default function Dashboard() {
             }
         };
         seedData();
-    }, [metrics, departmentRoadmap, okrFiveYearTargets, seedMetrics, seedDefaults, seedRoadmapFeatures, seedOKRData, seedAttempted]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [metrics, departmentRoadmap, okrFiveYearTargets]);
 
 
     const handleDocClick = (docTitle: string) => {
@@ -195,6 +203,72 @@ export default function Dashboard() {
         }
     };
 
+    // Key Result Handlers
+    const handleSaveKeyResult = async (kr: KeyResult) => {
+        setIsSaving(true);
+        try {
+            if (keyResultModal.item && (keyResultModal.item as any)._id) {
+                await updateKeyResultMutation({
+                    id: (keyResultModal.item as any)._id,
+                    pillar: kr.pillar,
+                    objective: kr.objective,
+                    keyResult: kr.keyResult,
+                    owner: kr.owner,
+                    target: kr.target,
+                    current: kr.current,
+                    progress: kr.progress,
+                    status: kr.status,
+                    confidence: kr.confidence,
+                    quarter: kr.quarter,
+                    thresholdAmber: kr.thresholdAmber,
+                    thresholdGreen: kr.thresholdGreen,
+                });
+            } else {
+                await addKeyResultMutation({
+                    pillar: kr.pillar,
+                    objective: kr.objective,
+                    keyResult: kr.keyResult,
+                    owner: kr.owner,
+                    target: kr.target,
+                    current: kr.current,
+                    progress: kr.progress,
+                    status: kr.status,
+                    confidence: kr.confidence,
+                    quarter: kr.quarter ?? 'Q1',
+                    thresholdAmber: kr.thresholdAmber,
+                    thresholdGreen: kr.thresholdGreen,
+                });
+            }
+            setActiveToast('Key result saved successfully');
+            setTimeout(() => setActiveToast(null), 3000);
+        } catch (error) {
+            console.error('Failed to save key result:', error);
+            setActiveToast('Error saving key result');
+            setTimeout(() => setActiveToast(null), 3000);
+        } finally {
+            setIsSaving(false);
+            setKeyResultModal({ isOpen: false });
+        }
+    };
+
+    const handleDeleteKeyResult = async () => {
+        const id = (keyResultModal.item as any)?._id;
+        if (!id) return;
+        setIsSaving(true);
+        try {
+            await deleteKeyResultMutation({ id });
+            setActiveToast('Key result deleted');
+            setTimeout(() => setActiveToast(null), 3000);
+        } catch (error) {
+            console.error('Failed to delete key result:', error);
+            setActiveToast('Error deleting key result');
+            setTimeout(() => setActiveToast(null), 3000);
+        } finally {
+            setIsSaving(false);
+            setKeyResultModal({ isOpen: false });
+        }
+    };
+
     if (
         metrics === undefined ||
         departmentRoadmap === undefined ||
@@ -301,7 +375,11 @@ export default function Dashboard() {
                             />
                         )}
                         {activeView === 'okr-q1' && (
-                            <OKRQ1View keyResults={uiKeyResults.filter((kr) => kr.quarter === 'Q1')} />
+                            <OKRQ1View
+                                keyResults={uiKeyResults.filter((kr) => kr.quarter === 'Q1')}
+                                onEdit={(kr) => setKeyResultModal({ isOpen: true, item: kr })}
+                                onAdd={() => setKeyResultModal({ isOpen: true })}
+                            />
                         )}
                         {activeView === 'okr-objectives' && (
                             <OKRObjectivesView
@@ -341,6 +419,19 @@ export default function Dashboard() {
                         onSave={handleSaveFeature}
                         onCancel={() => setFeatureModal({ isOpen: false })}
                         onDelete={featureModal.feature ? handleDeleteFeature : undefined}
+                    />
+                </Modal>
+
+                <Modal
+                    isOpen={keyResultModal.isOpen}
+                    onClose={() => setKeyResultModal({ isOpen: false })}
+                    title={keyResultModal.item ? 'Edit Key Result' : 'Add Key Result'}
+                >
+                    <EditKeyResultForm
+                        initialData={keyResultModal.item}
+                        onSave={handleSaveKeyResult}
+                        onCancel={() => setKeyResultModal({ isOpen: false })}
+                        onDelete={keyResultModal.item ? handleDeleteKeyResult : undefined}
                     />
                 </Modal>
 

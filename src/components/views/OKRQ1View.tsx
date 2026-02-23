@@ -3,10 +3,12 @@ import { KeyResult } from '@/types';
 import OKRProgressBar from '@/components/OKRProgressBar';
 import OKRStatusBadge from '@/components/OKRStatusBadge';
 import ConfidenceGauge from '@/components/ConfidenceGauge';
-import { User } from 'lucide-react';
+import { User, Edit3, Plus } from 'lucide-react';
 
 interface OKRQ1ViewProps {
     keyResults: KeyResult[];
+    onEdit?: (kr: KeyResult) => void;
+    onAdd?: () => void;
 }
 
 const PILLAR_STYLES: Record<string, { label: string; dot: string; border: string; bg: string }> = {
@@ -49,7 +51,7 @@ const DEFAULT_STYLE = {
     bg: 'bg-slate-50',
 };
 
-const OKRQ1View: React.FC<OKRQ1ViewProps> = ({ keyResults }) => {
+const OKRQ1View: React.FC<OKRQ1ViewProps> = ({ keyResults, onEdit, onAdd }) => {
     const pillarOrder = ['Tech', 'Diversification', 'Growth', 'Culture', 'Brand'];
     const presentPillars = pillarOrder.filter((p) =>
         keyResults.some((kr) => kr.pillar === p)
@@ -62,9 +64,20 @@ const OKRQ1View: React.FC<OKRQ1ViewProps> = ({ keyResults }) => {
     return (
         <div className="space-y-8 animate-in fade-in duration-500">
             {/* Header */}
-            <div>
-                <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Q1 Key Results</h1>
-                <p className="text-slate-500 mt-1 text-sm">Detailed progress by pillar and objective</p>
+            <div className="flex items-start justify-between gap-4">
+                <div>
+                    <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Q1 Key Results</h1>
+                    <p className="text-slate-500 mt-1 text-sm">Detailed progress by pillar and objective</p>
+                </div>
+                {onAdd && (
+                    <button
+                        onClick={onAdd}
+                        className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors shadow-sm shrink-0"
+                    >
+                        <Plus className="w-4 h-4" />
+                        Add Key Result
+                    </button>
+                )}
             </div>
 
             {keyResults.length === 0 && (
@@ -108,7 +121,7 @@ const OKRQ1View: React.FC<OKRQ1ViewProps> = ({ keyResults }) => {
                                         {objKRs.map((kr) => (
                                             <div
                                                 key={kr._id ?? kr.keyResult}
-                                                className="px-5 py-4 grid grid-cols-1 lg:grid-cols-[1fr_200px_auto_auto] gap-3 lg:gap-4 items-center"
+                                                className="px-5 py-4 grid grid-cols-1 lg:grid-cols-[1fr_200px_auto_auto_auto] gap-3 lg:gap-4 items-center group"
                                             >
                                                 {/* KR text + owner */}
                                                 <div>
@@ -128,7 +141,13 @@ const OKRQ1View: React.FC<OKRQ1ViewProps> = ({ keyResults }) => {
                                                     <div className="flex justify-between text-xs text-slate-400 mb-1">
                                                         <span>{kr.current} / {kr.target}</span>
                                                     </div>
-                                                    <OKRProgressBar progress={kr.progress} height="md" />
+                                                    <OKRProgressBar
+                                                        progress={kr.progress}
+                                                        height="md"
+                                                        target={kr.target}
+                                                        thresholdAmber={kr.thresholdAmber}
+                                                        thresholdGreen={kr.thresholdGreen}
+                                                    />
                                                 </div>
 
                                                 {/* Status badge */}
@@ -139,6 +158,17 @@ const OKRQ1View: React.FC<OKRQ1ViewProps> = ({ keyResults }) => {
                                                     <ConfidenceGauge value={kr.confidence} />
                                                     <span className="text-xs text-slate-400">conf.</span>
                                                 </div>
+
+                                                {/* Edit button */}
+                                                {onEdit && (
+                                                    <button
+                                                        onClick={() => onEdit(kr)}
+                                                        className="p-1.5 text-slate-300 hover:text-slate-600 hover:bg-slate-100 rounded-md transition-colors opacity-0 group-hover:opacity-100"
+                                                        title="Edit key result"
+                                                    >
+                                                        <Edit3 className="w-4 h-4" />
+                                                    </button>
+                                                )}
                                             </div>
                                         ))}
                                     </div>

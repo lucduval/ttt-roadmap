@@ -76,6 +76,8 @@ export interface KeyResult {
     status: OKRStatus;
     confidence: number; // 1–10
     quarter?: string;
+    thresholdAmber?: number; // current >= this → Amber
+    thresholdGreen?: number; // current >= this → Green
 }
 
 export interface WeeklyEntry {

@@ -70,6 +70,8 @@ export default defineSchema({
         status: v.string(), // "Green" | "Amber" | "Red"
         confidence: v.number(), // 1–10
         quarter: v.optional(v.string()), // e.g. "Q1"
+        thresholdAmber: v.optional(v.number()), // current >= this → Amber
+        thresholdGreen: v.optional(v.number()), // current >= this → Green
     }).index("by_pillar", ["pillar"]).index("by_quarter", ["quarter"]),
 
     okrWeeklyEntries: defineTable({
