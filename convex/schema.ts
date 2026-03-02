@@ -19,6 +19,16 @@ export default defineSchema({
         targetGoal: v.optional(v.string()),
         stretchGoal: v.optional(v.string()),
         currentValue: v.optional(v.number()),
+        quarterlyTargets: v.optional(v.array(v.object({
+            quarter: v.union(v.literal('Q1'), v.literal('Q2'), v.literal('Q3'), v.literal('Q4')),
+            baseGoal: v.string(),
+            targetGoal: v.string(),
+            stretchGoal: v.string(),
+        }))),
+        metricDefinitions: v.optional(v.array(v.object({
+            sectionTitle: v.string(),
+            items: v.array(v.string()),
+        }))),
     }),
     departments: defineTable({
         id: v.string(), // e.g. "fa"
@@ -87,4 +97,29 @@ export default defineSchema({
         blockers: v.optional(v.string()),
         decisionRequired: v.optional(v.string()),
     }).index("by_week", ["week"]).index("by_pillar", ["pillar"]),
+
+    // CRM Adoption Tracking
+    adoptionUsers: defineTable({
+        dynamicsId: v.string(),
+        fullName: v.string(),
+        email: v.optional(v.string()),
+        department: v.optional(v.string()),
+        isDisabled: v.boolean(),
+        lastActiveOn: v.optional(v.string()), // ISO date from Dynamics lastactivedon
+        lastSyncedAt: v.number(),
+    }).index("by_dynamics_id", ["dynamicsId"]),
+
+    adoptionActivity: defineTable({
+        dynamicsUserId: v.string(),
+        entityType: v.string(), // "cases" | "leads" | "contacts" | "invoices"
+        count: v.number(),
+        syncedAt: v.number(),
+    }).index("by_user_entity", ["dynamicsUserId", "entityType"]),
+
+    opportunityData: defineTable({
+        opportunityId: v.string(),  // riivo_opportunityid
+        isAutomated: v.boolean(),   // riivo_automatedopportunity
+        createdOn: v.string(),      // createdon (ISO)
+        syncedAt: v.number(),
+    }).index("by_opportunity_id", ["opportunityId"]),
 });

@@ -5,14 +5,15 @@ import {
     Layers,
     FileCode,
     BookOpen,
-    Settings,
     FileText,
     X,
     LayoutDashboard,
     ListChecks,
     Target,
     Flag,
+    Users,
 } from 'lucide-react';
+import { UserButton, useUser } from "@clerk/nextjs";
 
 interface NavItemProps {
     icon: React.ReactNode;
@@ -42,6 +43,9 @@ interface SidebarProps {
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ activeView, setActiveView, isOpen, onClose }) => {
+    const { user } = useUser();
+    const isAdmin = user?.publicMetadata?.role === "admin";
+
     const handleNavClick = (view: string) => {
         setActiveView(view);
         onClose();
@@ -89,12 +93,14 @@ const Sidebar: React.FC<SidebarProps> = ({ activeView, setActiveView, isOpen, on
                         active={activeView === 'overview'}
                         onClick={() => handleNavClick('overview')}
                     />
-                    <NavItem
-                        icon={<BarChart3 className="w-5 h-5" />}
-                        label="Metrics"
-                        active={activeView === 'metrics'}
-                        onClick={() => handleNavClick('metrics')}
-                    />
+                    {isAdmin && (
+                        <NavItem
+                            icon={<BarChart3 className="w-5 h-5" />}
+                            label="Metrics"
+                            active={activeView === 'metrics'}
+                            onClick={() => handleNavClick('metrics')}
+                        />
+                    )}
                     <NavItem
                         icon={<Map className="w-5 h-5" />}
                         label="Roadmap"
@@ -136,6 +142,18 @@ const Sidebar: React.FC<SidebarProps> = ({ activeView, setActiveView, isOpen, on
                         onClick={() => handleNavClick('features')}
                     />
 
+                    {isAdmin && (
+                        <>
+                            <div className="px-4 pb-2 pt-6 text-xs font-bold text-slate-500 uppercase tracking-wider">Dashboards</div>
+                            <NavItem
+                                icon={<Users className="w-5 h-5" />}
+                                label="riivo Metrics"
+                                active={activeView === 'adoption'}
+                                onClick={() => handleNavClick('adoption')}
+                            />
+                        </>
+                    )}
+
                     <div className="px-4 pb-2 pt-6 text-xs font-bold text-slate-500 uppercase tracking-wider">Library</div>
                     <NavItem
                         icon={<FileCode className="w-5 h-5" />}
@@ -152,10 +170,17 @@ const Sidebar: React.FC<SidebarProps> = ({ activeView, setActiveView, isOpen, on
                 </nav>
 
                 <div className="p-4 border-t border-slate-800">
-                    <button className="flex items-center space-x-3 text-sm text-slate-400 hover:text-white transition-colors w-full px-2 py-2 rounded-md hover:bg-slate-800/50">
-                        <Settings className="w-5 h-5" />
-                        <span>Settings</span>
-                    </button>
+                    <div className="flex items-center space-x-3 px-2 py-2">
+                        <UserButton
+                            afterSignOutUrl="/sign-in"
+                            appearance={{
+                                elements: {
+                                    avatarBox: "w-8 h-8",
+                                },
+                            }}
+                        />
+                        <span className="text-sm text-slate-400">Account</span>
+                    </div>
                 </div>
             </aside>
         </>

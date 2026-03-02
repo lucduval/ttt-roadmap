@@ -8,12 +8,14 @@ import FeaturesView from './views/FeaturesView';
 import RoadmapView from './views/RoadmapView';
 import DocsView from './views/DocsView';
 import TechnicalSpecsView from './views/TechnicalSpecsView';
-import { StrategicMetric, Feature, Department, FiveYearTarget, AnnualObjective, KeyResult } from '@/types';
-import { Settings, Edit3, X, Menu } from 'lucide-react';
+import { StrategicMetric, Feature, Department, FiveYearTarget, AnnualObjective, KeyResult, MetricDefinitionSection } from '@/types';
+import { Menu, Lock } from 'lucide-react';
+import { UserButton, useUser } from '@clerk/nextjs';
 import OKRDashboardView from './views/OKRDashboardView';
 import OKRQ1View from './views/OKRQ1View';
 import OKRObjectivesView from './views/OKRObjectivesView';
 import OKRTargetsView from './views/OKRTargetsView';
+import AdoptionView from './views/AdoptionView';
 import Modal from './ui/Modal';
 import EditMetricForm from './forms/EditMetricForm';
 import EditFeatureForm from './forms/EditFeatureForm';
@@ -21,7 +23,18 @@ import EditKeyResultForm from './forms/EditKeyResultForm';
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
 
+const AccessDenied: React.FC = () => (
+    <div className="flex flex-col items-center justify-center h-64 text-slate-400 gap-3">
+        <Lock className="w-10 h-10 text-slate-300" />
+        <p className="text-lg font-medium text-slate-500">Access Restricted</p>
+        <p className="text-sm text-slate-400">This view is available to admins only.</p>
+    </div>
+);
+
 export default function Dashboard() {
+    const { user } = useUser();
+    const isAdmin = user?.publicMetadata?.role === "admin";
+
     // Convex Data
     const metrics = useQuery(api.metrics.get);
     const departmentRoadmap = useQuery(api.roadmap.getExploreData);
@@ -38,6 +51,9 @@ export default function Dashboard() {
     const seedAllOKRData = useMutation(api.okr.seedAllOKRData);
     const addMetric = useMutation(api.metrics.add);
     const updateMetric = useMutation(api.metrics.update);
+    const seedQuarterlyTargets = useMutation(api.metrics.seedQuarterlyTargets);
+    const seedDefinitions = useMutation(api.metrics.seedDefinitions);
+    const updateDefinitions = useMutation(api.metrics.updateDefinitions);
     const addFeature = useMutation(api.roadmap.addFeature);
     const updateFeature = useMutation(api.roadmap.updateFeature);
     const updateFeatureDates = useMutation(api.roadmap.updateFeatureDates);
@@ -56,14 +72,21 @@ export default function Dashboard() {
     const [featureModal, setFeatureModal] = useState<{ isOpen: boolean, deptId?: string, feature?: Feature, featureIndex?: number }>({ isOpen: false });
     const [keyResultModal, setKeyResultModal] = useState<{ isOpen: boolean, item?: KeyResult }>({ isOpen: false });
 
-    // Initial Seeding Effect (runs once — backend is idempotent via _metadata flag)
+    // Initial Seeding Effect — admin-only, runs once (backend is idempotent via _metadata flag)
     const [seedAttempted, setSeedAttempted] = useState(false);
     useEffect(() => {
-        if (seedAttempted) return;
+        if (seedAttempted || !isAdmin) return;
         const seedData = async () => {
             if (metrics !== undefined && metrics.length === 0) {
                 const localData = await import('../data/data.json');
-                await seedMetrics({ metrics: localData.strategicAlignment });
+                const metricsWithCast = localData.strategicAlignment.map((m: any) => ({
+                    ...m,
+                    quarterlyTargets: m.quarterlyTargets?.map((qt: any) => ({
+                        ...qt,
+                        quarter: qt.quarter as 'Q1' | 'Q2' | 'Q3' | 'Q4',
+                    })),
+                }));
+                await seedMetrics({ metrics: metricsWithCast });
             }
             if (departmentRoadmap !== undefined && departmentRoadmap.length === 0) {
                 await seedDefaults();
@@ -78,13 +101,18 @@ export default function Dashboard() {
                 metrics !== undefined && metrics.length > 0 &&
                 departmentRoadmap !== undefined && departmentRoadmap.length > 0
             ) {
-                setSeedAttempted(true);
                 await seedRoadmapFeatures();
             }
+            // Always run quarterly targets migration (idempotent — skips already-patched records)
+            await seedQuarterlyTargets();
+            // Always run definitions seed (idempotent — skips already-patched records)
+            await seedDefinitions();
+
+            setSeedAttempted(true);
         };
         seedData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [metrics, departmentRoadmap, okrFiveYearTargets]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [metrics, departmentRoadmap, okrFiveYearTargets, isAdmin]);
 
 
     const handleDocClick = (docTitle: string) => {
@@ -113,6 +141,19 @@ export default function Dashboard() {
         } finally {
             setIsSaving(false);
             setMetricModal({ isOpen: false });
+        }
+    };
+
+    // Definition Handlers
+    const handleSaveDefinitions = async (metricId: string, definitions: MetricDefinitionSection[]) => {
+        try {
+            await updateDefinitions({ id: metricId as any, metricDefinitions: definitions });
+            setActiveToast('Definition saved successfully');
+            setTimeout(() => setActiveToast(null), 3000);
+        } catch (error) {
+            console.error('Failed to save definitions:', error);
+            setActiveToast('Error saving definition');
+            setTimeout(() => setActiveToast(null), 3000);
         }
     };
 
@@ -305,12 +346,13 @@ export default function Dashboard() {
                         <img src="/logo.png" alt="Logo" className="w-6 h-6 rounded-full" />
                         <span className="font-bold text-slate-900 text-sm">TTT Roadmap</span>
                     </div>
-                    <div className="w-9" />
+                    <UserButton afterSignOutUrl="/sign-in" />
                 </div>
 
-                {/* Top Bar with Saving Indicator */}
-                <div className="absolute top-3 right-3 sm:top-4 sm:right-8 z-40 flex items-center max-lg:top-[60px]">
+                {/* Top Bar with Saving Indicator & User */}
+                <div className="absolute top-3 right-3 sm:top-4 sm:right-8 z-40 flex items-center gap-3 max-lg:hidden">
                     {isSaving && <span className="text-xs text-slate-400 animate-pulse bg-white/80 backdrop-blur-sm px-2 py-1 rounded">Saving...</span>}
+                    <UserButton afterSignOutUrl="/sign-in" />
                 </div>
 
                 {/* Toast - bottom on mobile, top on desktop */}
@@ -326,31 +368,34 @@ export default function Dashboard() {
                     <div className="max-w-6xl mx-auto pt-2 sm:pt-4 lg:pt-8">
                         {activeView === 'overview' && <OverviewView />}
                         {activeView === 'metrics' && (
-                            <MetricsView
-                                data={uiMetrics}
-                                onEdit={(item, index) => setMetricModal({ isOpen: true, item, index })}
-                                onAdd={() => setMetricModal({ isOpen: true })}
-                            />
+                            isAdmin ? (
+                                <MetricsView
+                                    data={uiMetrics}
+                                    onEdit={(item, index) => setMetricModal({ isOpen: true, item, index })}
+                                    onAdd={() => setMetricModal({ isOpen: true })}
+                                    onSaveDefinitions={handleSaveDefinitions}
+                                />
+                            ) : <AccessDenied />
                         )}
                         {activeView === 'roadmap' && (
                             <RoadmapView
                                 data={uiRoadmap}
                                 metrics={uiMetrics}
                                 onDocClick={handleDocClick}
-                                isEditing={true}
-                                onEdit={(deptId, feature, index) => setFeatureModal({ isOpen: true, deptId, feature, featureIndex: index })}
-                                onAdd={() => setFeatureModal({ isOpen: true, deptId: uiRoadmap[0]?.id })}
-                                onUpdateDates={handleUpdateFeatureDates}
+                                isEditing={isAdmin}
+                                onEdit={isAdmin ? (deptId, feature, index) => setFeatureModal({ isOpen: true, deptId, feature, featureIndex: index }) : () => {}}
+                                onAdd={isAdmin ? () => setFeatureModal({ isOpen: true, deptId: uiRoadmap[0]?.id }) : () => {}}
+                                onUpdateDates={isAdmin ? handleUpdateFeatureDates : async () => {}}
                             />
                         )}
                         {activeView === 'features' && (
                             <FeaturesView
                                 data={uiRoadmap}
                                 onDocClick={handleDocClick}
-                                isEditing={true}
-                                onEdit={(deptId, feature, index) => setFeatureModal({ isOpen: true, deptId, feature, featureIndex: index })}
-                                onAdd={(deptId) => setFeatureModal({ isOpen: true, deptId })}
-                                onDelete={async (feature) => {
+                                isEditing={isAdmin}
+                                onEdit={isAdmin ? (deptId, feature, index) => setFeatureModal({ isOpen: true, deptId, feature, featureIndex: index }) : () => {}}
+                                onAdd={isAdmin ? (deptId) => setFeatureModal({ isOpen: true, deptId }) : () => {}}
+                                onDelete={isAdmin ? async (feature) => {
                                     const featureId = (feature as any)?._id;
                                     if (!featureId) return;
                                     try {
@@ -362,7 +407,7 @@ export default function Dashboard() {
                                         setActiveToast('Error deleting feature');
                                         setTimeout(() => setActiveToast(null), 3000);
                                     }
-                                }}
+                                } : async () => {}}
                             />
                         )}
                         {activeView === 'specs' && <TechnicalSpecsView />}
@@ -377,8 +422,8 @@ export default function Dashboard() {
                         {activeView === 'okr-q1' && (
                             <OKRQ1View
                                 keyResults={uiKeyResults.filter((kr) => kr.quarter === 'Q1')}
-                                onEdit={(kr) => setKeyResultModal({ isOpen: true, item: kr })}
-                                onAdd={() => setKeyResultModal({ isOpen: true })}
+                                onEdit={isAdmin ? (kr) => setKeyResultModal({ isOpen: true, item: kr }) : () => {}}
+                                onAdd={isAdmin ? () => setKeyResultModal({ isOpen: true }) : () => {}}
                             />
                         )}
                         {activeView === 'okr-objectives' && (
@@ -389,6 +434,9 @@ export default function Dashboard() {
                         )}
                         {activeView === 'okr-targets' && (
                             <OKRTargetsView fiveYearTargets={uiFiveYearTargets} />
+                        )}
+                        {activeView === 'adoption' && (
+                            isAdmin ? <AdoptionView /> : <AccessDenied />
                         )}
                     </div>
                 </div>
@@ -434,6 +482,7 @@ export default function Dashboard() {
                         onDelete={keyResultModal.item ? handleDeleteKeyResult : undefined}
                     />
                 </Modal>
+
 
             </main>
         </div>

@@ -8,6 +8,9 @@
  * @module
  */
 
+import type * as adoption from "../adoption.js";
+import type * as crons from "../crons.js";
+import type * as lib_auth from "../lib/auth.js";
 import type * as metrics from "../metrics.js";
 import type * as okr from "../okr.js";
 import type * as roadmap from "../roadmap.js";
@@ -19,6 +22,9 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
+  adoption: typeof adoption;
+  crons: typeof crons;
+  "lib/auth": typeof lib_auth;
   metrics: typeof metrics;
   okr: typeof okr;
   roadmap: typeof roadmap;

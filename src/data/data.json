@@ -1,30 +1,43 @@
 {
   "strategicAlignment": [
     {
-      "engine": "Sales Growth",
-      "focus": "WhatsApp Engagement",
-      "metric": "Client-initiated servicing via WhatsApp (inbound)",
-      "description": "Client-initiated servicing via WhatsApp (inbound).",
-      "detailedMeasurement": "% of active clients with ≥1 inbound WhatsApp thread in-year (exclude outbound-only). Also track new-client cohort.",
-      "baseGoal": "20%",
-      "targetGoal": "30%",
-      "stretchGoal": "40%",
-      "icon": "MessageCircle",
-      "iconColor": "text-emerald-500",
-      "currentValue": 25
-    },
-    {
-      "engine": "Sales Growth",
-      "focus": "Digital Compliance",
-      "metric": "Digital signing via Quickly Sign",
-      "description": "Digital signing via Quickly Sign.",
-      "detailedMeasurement": "% of in-scope docs signed digitally within SLA (report by LOE, approval, audit, consent).",
-      "baseGoal": "60%",
-      "targetGoal": "70%",
-      "stretchGoal": "85%",
-      "icon": "CheckCircle",
-      "iconColor": "text-blue-500",
-      "currentValue": 65
+      "engine": "Library",
+      "focus": "FA Lead Generation",
+      "metric": "Validated FA opportunities from data mining",
+      "description": "Validated FA opportunities from data mining.",
+      "detailedMeasurement": "# of leads surfaced by scoring rules and validated by FA team; enforce <10% duplication.",
+      "baseGoal": "700",
+      "targetGoal": "1,000",
+      "stretchGoal": "1,400",
+      "icon": "Target",
+      "iconColor": "text-red-500",
+      "currentValue": 850,
+      "quarterlyTargets": [
+        {
+          "quarter": "Q1",
+          "baseGoal": "200",
+          "targetGoal": "250",
+          "stretchGoal": "300"
+        },
+        {
+          "quarter": "Q2",
+          "baseGoal": "220",
+          "targetGoal": "280",
+          "stretchGoal": "340"
+        },
+        {
+          "quarter": "Q3",
+          "baseGoal": "220",
+          "targetGoal": "280",
+          "stretchGoal": "340"
+        },
+        {
+          "quarter": "Q4",
+          "baseGoal": "150",
+          "targetGoal": "190",
+          "stretchGoal": "220"
+        }
+      ]
     },
     {
       "engine": "Product",
@@ -37,20 +50,99 @@
       "stretchGoal": "90%",
       "icon": "TrendingUp",
       "iconColor": "text-purple-500",
-      "currentValue": 75
+      "currentValue": 75,
+      "quarterlyTargets": [
+        {
+          "quarter": "Q1",
+          "baseGoal": "30%",
+          "targetGoal": "40%",
+          "stretchGoal": "50%"
+        },
+        {
+          "quarter": "Q2",
+          "baseGoal": "45%",
+          "targetGoal": "55%",
+          "stretchGoal": "65%"
+        },
+        {
+          "quarter": "Q3",
+          "baseGoal": "55%",
+          "targetGoal": "65%",
+          "stretchGoal": "75%"
+        },
+        {
+          "quarter": "Q4",
+          "baseGoal": "70%",
+          "targetGoal": "80%",
+          "stretchGoal": "90%"
+        }
+      ]
     },
     {
-      "engine": "Library",
-      "focus": "FA Lead Generation",
-      "metric": "Validated FA opportunities from data mining",
-      "description": "Validated FA opportunities from data mining.",
-      "detailedMeasurement": "# of leads surfaced by scoring rules and validated by FA team; enforce <10% duplication.",
-      "baseGoal": "700",
-      "targetGoal": "1,000",
-      "stretchGoal": "1,400",
-      "icon": "Target",
-      "iconColor": "text-red-500",
-      "currentValue": 850
+      "engine": "Sales Growth",
+      "focus": "WhatsApp Engagement",
+      "metric": "Client-initiated servicing via WhatsApp (inbound)",
+      "description": "Client-initiated servicing via WhatsApp (inbound).",
+      "detailedMeasurement": "% of active clients with ≥1 inbound WhatsApp thread in-year (exclude outbound-only). Also track new-client cohort.",
+      "baseGoal": "20%",
+      "targetGoal": "30%",
+      "stretchGoal": "40%",
+      "icon": "MessageCircle",
+      "iconColor": "text-emerald-500",
+      "currentValue": 25,
+      "quarterlyTargets": [
+        {
+          "quarter": "Q2",
+          "baseGoal": "10%",
+          "targetGoal": "16%",
+          "stretchGoal": "20%"
+        },
+        {
+          "quarter": "Q3",
+          "baseGoal": "18%",
+          "targetGoal": "25%",
+          "stretchGoal": "32%"
+        },
+        {
+          "quarter": "Q4",
+          "baseGoal": "24%",
+          "targetGoal": "30%",
+          "stretchGoal": "40%"
+        }
+      ]
+    },
+    {
+      "engine": "Sales Growth",
+      "focus": "Digital Compliance",
+      "metric": "Digital signing via Quickly Sign",
+      "description": "Digital signing via Quickly Sign.",
+      "detailedMeasurement": "% of in-scope docs signed digitally within SLA (report by LOE, approval, audit, consent).",
+      "baseGoal": "60%",
+      "targetGoal": "70%",
+      "stretchGoal": "85%",
+      "icon": "CheckCircle",
+      "iconColor": "text-blue-500",
+      "currentValue": 65,
+      "quarterlyTargets": [
+        {
+          "quarter": "Q2",
+          "baseGoal": "55%",
+          "targetGoal": "65%",
+          "stretchGoal": "72%"
+        },
+        {
+          "quarter": "Q3",
+          "baseGoal": "60%",
+          "targetGoal": "70%",
+          "stretchGoal": "78%"
+        },
+        {
+          "quarter": "Q4",
+          "baseGoal": "65%",
+          "targetGoal": "75%",
+          "stretchGoal": "85%"
+        }
+      ]
     },
     {
       "engine": "Efficiency",
@@ -63,7 +155,27 @@
       "stretchGoal": "65%",
       "icon": "Zap",
       "iconColor": "text-yellow-500",
-      "currentValue": 40
+      "currentValue": 40,
+      "quarterlyTargets": [
+        {
+          "quarter": "Q2",
+          "baseGoal": "20%",
+          "targetGoal": "30%",
+          "stretchGoal": "40%"
+        },
+        {
+          "quarter": "Q3",
+          "baseGoal": "30%",
+          "targetGoal": "42%",
+          "stretchGoal": "55%"
+        },
+        {
+          "quarter": "Q4",
+          "baseGoal": "40%",
+          "targetGoal": "55%",
+          "stretchGoal": "68%"
+        }
+      ]
     }
   ],
   "departmentRoadmap": []

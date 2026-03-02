@@ -1,5 +1,6 @@
 import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
+import { requireAdmin } from "./lib/auth";
 
 // ─── Queries ────────────────────────────────────────────────────────────────
 
@@ -42,6 +43,7 @@ export const getWeeklyEntries = query({
 export const seedOKRData = mutation({
     args: {},
     handler: async (ctx) => {
+        await requireAdmin(ctx);
         // Guard: skip if already seeded
         const existing = await ctx.db.query("okrFiveYearTargets").first();
         if (existing) return;
@@ -150,6 +152,7 @@ export const seedOKRData = mutation({
 export const seedAllOKRData = mutation({
     args: {},
     handler: async (ctx) => {
+        await requireAdmin(ctx);
         const flag = await ctx.db
             .query("appMetadata")
             .withIndex("by_key", (q) => q.eq("key", "okrFullSeedV1"))
@@ -291,6 +294,7 @@ export const updateKeyResult = mutation({
         thresholdGreen: v.optional(v.number()),
     },
     handler: async (ctx, { id, ...fields }) => {
+        await requireAdmin(ctx);
         const existing = await ctx.db.get(id);
         if (!existing) return;
 
@@ -333,6 +337,7 @@ export const addKeyResult = mutation({
         thresholdGreen: v.optional(v.number()),
     },
     handler: async (ctx, args) => {
+        await requireAdmin(ctx);
         const status = deriveStatus(args.current, args.thresholdAmber, args.thresholdGreen, args.status);
         return await ctx.db.insert("okrKeyResults", { ...args, status });
     },
@@ -341,6 +346,7 @@ export const addKeyResult = mutation({
 export const migrateAnnualToQ1 = mutation({
     args: {},
     handler: async (ctx) => {
+        await requireAdmin(ctx);
         const allKRs = await ctx.db.query("okrKeyResults").collect();
         const annualKRs = allKRs.filter((kr) => kr.quarter === "Annual" || !kr.quarter);
         for (const kr of annualKRs) {
@@ -353,6 +359,7 @@ export const migrateAnnualToQ1 = mutation({
 export const deleteKeyResult = mutation({
     args: { id: v.id("okrKeyResults") },
     handler: async (ctx, { id }) => {
+        await requireAdmin(ctx);
         await ctx.db.delete(id);
     },
 });
@@ -372,6 +379,7 @@ export const addWeeklyEntry = mutation({
         decisionRequired: v.optional(v.string()),
     },
     handler: async (ctx, args) => {
+        await requireAdmin(ctx);
         return await ctx.db.insert("okrWeeklyEntries", args);
     },
 });

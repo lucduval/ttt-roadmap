@@ -1,5 +1,6 @@
 import { query, mutation } from "./_generated/server";
 import { v } from "convex/values";
+import { requireAdmin } from "./lib/auth";
 
 // Get all roadmap data (departments + features nested)
 export const getExploreData = query({
@@ -37,6 +38,7 @@ export const addFeature = mutation({
         metricId: v.optional(v.id("metrics")),
     },
     handler: async (ctx, args) => {
+        await requireAdmin(ctx);
         await ctx.db.insert("features", args);
     },
 });
@@ -56,6 +58,7 @@ export const updateFeature = mutation({
         metricId: v.optional(v.id("metrics")),
     },
     handler: async (ctx, args) => {
+        await requireAdmin(ctx);
         const { id, ...rest } = args;
         await ctx.db.patch(id, rest);
     },
@@ -66,6 +69,7 @@ export const deleteFeature = mutation({
         id: v.id("features"),
     },
     handler: async (ctx, args) => {
+        await requireAdmin(ctx);
         await ctx.db.delete(args.id);
     },
 });
@@ -77,6 +81,7 @@ export const updateFeatureDates = mutation({
         endDate: v.string(),
     },
     handler: async (ctx, args) => {
+        await requireAdmin(ctx);
         const { id, startDate, endDate } = args;
         await ctx.db.patch(id, { startDate, endDate });
     },
@@ -87,6 +92,7 @@ export const updateFeatureDates = mutation({
 export const deleteAllFeatures = mutation({
     args: {},
     handler: async (ctx) => {
+        await requireAdmin(ctx);
         const features = await ctx.db.query("features").collect();
         for (const feature of features) {
             await ctx.db.delete(feature._id);
@@ -99,6 +105,7 @@ export const deleteAllFeatures = mutation({
 export const resetFeaturesSeed = mutation({
     args: {},
     handler: async (ctx) => {
+        await requireAdmin(ctx);
         const seeded = await ctx.db
             .query("appMetadata")
             .withIndex("by_key", q => q.eq("key", "features_seeded"))
@@ -130,6 +137,7 @@ export const seed = mutation({
         }))
     },
     handler: async (ctx, args) => {
+        await requireAdmin(ctx);
         const existingDepts = await ctx.db.query("departments").collect();
         if (existingDepts.length === 0) {
             for (const dept of args.departments) {
@@ -159,6 +167,7 @@ export const seed = mutation({
 export const seedDefaults = mutation({
     args: {},
     handler: async (ctx) => {
+        await requireAdmin(ctx);
         const existingDepts = await ctx.db.query("departments").collect();
         if (existingDepts.length === 0) {
             const departments = [
@@ -179,6 +188,7 @@ export const seedDefaults = mutation({
 export const seedRoadmapFeatures = mutation({
     args: {},
     handler: async (ctx) => {
+        await requireAdmin(ctx);
         // Check if we've already seeded — once seeded, never re-seed
         const seeded = await ctx.db
             .query("appMetadata")

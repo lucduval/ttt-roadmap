@@ -1,3 +1,8 @@
+export interface MetricDefinitionSection {
+    sectionTitle: string;
+    items: string[];
+}
+
 export interface StrategicMetric {
     _id?: string; // Convex ID
     engine: string;
@@ -12,6 +17,13 @@ export interface StrategicMetric {
     targetGoal?: string;
     stretchGoal?: string;
     currentValue?: number;
+    quarterlyTargets?: {
+        quarter: 'Q1' | 'Q2' | 'Q3' | 'Q4';
+        baseGoal: string;
+        targetGoal: string;
+        stretchGoal: string;
+    }[];
+    metricDefinitions?: MetricDefinitionSection[];
 }
 
 export interface Feature {
