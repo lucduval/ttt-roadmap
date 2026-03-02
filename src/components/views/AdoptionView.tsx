@@ -340,8 +340,8 @@ function AdoptionByDeptCharts({
                         <YAxis domain={[0, 100]} tick={{ fontSize: 12, fill: '#94a3b8' }} axisLine={false} tickLine={false} tickFormatter={(v) => `${v}%`} />
                         <Tooltip
                             contentStyle={{ borderRadius: '8px', border: '1px solid #e2e8f0', fontSize: '12px' }}
-                            formatter={(value: number, _name: string, props) => [
-                                `${value}% (${(props.payload as { active: number }).active} / ${(props.payload as { total: number }).total} users)`,
+                            formatter={(value, _name, props) => [
+                                `${value ?? 0}% (${(props.payload as { active: number }).active} / ${(props.payload as { total: number }).total} users)`,
                                 'Active Rate',
                             ]}
                         />
