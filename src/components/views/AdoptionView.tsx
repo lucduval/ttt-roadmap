@@ -238,8 +238,8 @@ function FALeadCharts() {
                                 <YAxis tick={{ fontSize: 12, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
                                 <Tooltip
                                     contentStyle={{ borderRadius: '8px', border: '1px solid #e2e8f0', fontSize: '12px' }}
-                                    formatter={(value: number, name: string) => [
-                                        value,
+                                    formatter={(value: number | undefined, name: string) => [
+                                        value ?? 0,
                                         name === 'count' ? 'New this month' : 'Cumulative',
                                     ]}
                                 />
