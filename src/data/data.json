@@ -15,9 +15,9 @@
       "quarterlyTargets": [
         {
           "quarter": "Q1",
-          "baseGoal": "200",
-          "targetGoal": "250",
-          "stretchGoal": "300"
+          "baseGoal": "80",
+          "targetGoal": "100",
+          "stretchGoal": "120"
         },
         {
           "quarter": "Q2",

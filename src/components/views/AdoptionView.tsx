@@ -25,7 +25,7 @@ const TIME_PERIOD_OPTIONS: { value: TimePeriod; label: string; days: number }[] 
 type SortKey = 'fullName' | 'department' | 'lastActiveOn' | 'cases' | 'leads' | 'contacts' | 'invoices' | 'opportunities' | 'status';
 
 // Q1 targets
-const FA_LEAD_Q1 = { base: 200, target: 250, stretch: 300 };
+const FA_LEAD_Q1 = { base: 80, target: 100, stretch: 120 };
 const ADOPTION_Q1 = { base: 30, target: 40, stretch: 50 }; // percentages
 
 const DEPT_COLORS: Record<string, string> = {
@@ -334,7 +334,7 @@ function AdoptionByDeptCharts({
             <div>
                 <h3 className="text-sm font-semibold text-slate-700 mb-4">Active User Rate per Department</h3>
                 <ResponsiveContainer width="100%" height={220}>
-                    <BarChart data={adoptionData} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
+                    <BarChart data={adoptionData} margin={{ top: 10, right: 70, left: 0, bottom: 0 }}>
                         <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
                         <XAxis dataKey="dept" tick={{ fontSize: 12, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
                         <YAxis domain={[0, 100]} tick={{ fontSize: 12, fill: '#94a3b8' }} axisLine={false} tickLine={false} tickFormatter={(v) => `${v}%`} />
