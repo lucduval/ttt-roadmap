@@ -260,7 +260,8 @@ export default function Dashboard() {
                     progress: kr.progress,
                     status: kr.status,
                     confidence: kr.confidence,
-                    quarter: kr.quarter,
+                    quarter: kr.quarter as "Q1" | "Q2" | "Q3" | "Q4" | undefined,
+                    targetValue: kr.targetValue,
                     thresholdAmber: kr.thresholdAmber,
                     thresholdGreen: kr.thresholdGreen,
                 });
@@ -275,7 +276,8 @@ export default function Dashboard() {
                     progress: kr.progress,
                     status: kr.status,
                     confidence: kr.confidence,
-                    quarter: kr.quarter ?? 'Q1',
+                    quarter: (kr.quarter ?? 'Q1') as "Q1" | "Q2" | "Q3" | "Q4",
+                    targetValue: kr.targetValue,
                     thresholdAmber: kr.thresholdAmber,
                     thresholdGreen: kr.thresholdGreen,
                 });
@@ -421,7 +423,7 @@ export default function Dashboard() {
                         )}
                         {activeView === 'okr-q1' && (
                             <OKRQ1View
-                                keyResults={uiKeyResults.filter((kr) => kr.quarter === 'Q1')}
+                                keyResults={uiKeyResults}
                                 onEdit={isAdmin ? (kr) => setKeyResultModal({ isOpen: true, item: kr }) : () => {}}
                                 onAdd={isAdmin ? () => setKeyResultModal({ isOpen: true }) : () => {}}
                             />

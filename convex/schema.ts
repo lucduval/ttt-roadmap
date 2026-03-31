@@ -79,7 +79,8 @@ export default defineSchema({
         progress: v.number(), // 0–1 decimal
         status: v.string(), // "Green" | "Amber" | "Red"
         confidence: v.number(), // 1–10
-        quarter: v.optional(v.string()), // e.g. "Q1"
+        quarter: v.optional(v.union(v.literal("Q1"), v.literal("Q2"), v.literal("Q3"), v.literal("Q4"))),
+        targetValue: v.optional(v.number()), // end-of-quarter target (e.g. 100 for 100%)
         thresholdAmber: v.optional(v.number()), // current >= this → Amber
         thresholdGreen: v.optional(v.number()), // current >= this → Green
     }).index("by_pillar", ["pillar"]).index("by_quarter", ["quarter"]),

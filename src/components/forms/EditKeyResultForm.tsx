@@ -122,13 +122,17 @@ const EditKeyResultForm: React.FC<EditKeyResultFormProps> = ({ initialData, onSa
                 </div>
                 <div>
                     <Label htmlFor="quarter">Quarter</Label>
-                    <Input
+                    <Select
                         id="quarter"
                         value={formData.quarter ?? 'Q1'}
                         onChange={(e) => set('quarter', e.target.value)}
-                        placeholder="e.g. Q1"
                         required
-                    />
+                    >
+                        <option value="Q1">Q1</option>
+                        <option value="Q2">Q2</option>
+                        <option value="Q3">Q3</option>
+                        <option value="Q4">Q4</option>
+                    </Select>
                 </div>
             </div>
 
@@ -187,6 +191,26 @@ const EditKeyResultForm: React.FC<EditKeyResultFormProps> = ({ initialData, onSa
                         value={formData.current}
                         onChange={(e) => set('current', parseFloat(e.target.value) || 0)}
                         required
+                    />
+                </div>
+                <div>
+                    <Label htmlFor="targetValue">
+                        <span className="flex items-center gap-1.5">
+                            End-of-Quarter Target
+                            <span className="text-slate-400 font-normal">(for chart target line)</span>
+                        </span>
+                    </Label>
+                    <Input
+                        id="targetValue"
+                        type="number"
+                        min={0}
+                        step="any"
+                        value={formData.targetValue ?? ''}
+                        placeholder="e.g. 100"
+                        onChange={(e) => {
+                            const val = e.target.value === '' ? undefined : parseFloat(e.target.value);
+                            setFormData((prev) => ({ ...prev, targetValue: val }));
+                        }}
                     />
                 </div>
                 <p className="col-span-2 text-xs text-slate-500 -mt-2">

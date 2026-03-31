@@ -76,6 +76,8 @@ export interface AnnualObjective {
     successMetric?: string;
 }
 
+export type Quarter = "Q1" | "Q2" | "Q3" | "Q4";
+
 export interface KeyResult {
     _id?: string;
     pillar: string;
@@ -87,7 +89,8 @@ export interface KeyResult {
     progress: number; // 0–1 decimal
     status: OKRStatus;
     confidence: number; // 1–10
-    quarter?: string;
+    quarter?: Quarter;
+    targetValue?: number; // end-of-quarter target
     thresholdAmber?: number; // current >= this → Amber
     thresholdGreen?: number; // current >= this → Green
 }

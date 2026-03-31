@@ -19,7 +19,7 @@ export const getAnnualObjectives = query({
 });
 
 export const getKeyResults = query({
-    args: { quarter: v.optional(v.string()) },
+    args: { quarter: v.optional(v.union(v.literal("Q1"), v.literal("Q2"), v.literal("Q3"), v.literal("Q4"))) },
     handler: async (ctx, { quarter }) => {
         if (quarter) {
             return await ctx.db
@@ -116,7 +116,7 @@ export const seedOKRData = mutation({
                 progress: 0.5,
                 status: "Amber",
                 confidence: 8,
-                quarter: "Q1",
+                quarter: "Q1" as const,
             },
             {
                 pillar: "Growth",
@@ -128,7 +128,7 @@ export const seedOKRData = mutation({
                 progress: 0.1,
                 status: "Red",
                 confidence: 5,
-                quarter: "Q1",
+                quarter: "Q1" as const,
             },
             {
                 pillar: "Growth",
@@ -140,7 +140,7 @@ export const seedOKRData = mutation({
                 progress: 0.13,
                 status: "Red",
                 confidence: 9,
-                quarter: "Q1",
+                quarter: "Q1" as const,
             },
         ];
         for (const kr of keyResults) {
@@ -192,72 +192,112 @@ export const seedAllOKRData = mutation({
 
         const keyResults = [
             // Tech — Full Group adoption of TTT System (Q1)
-            { pillar: "Tech", objective: "Full Group adoption of TTT System", keyResult: "Establish new OPSCO team", owner: "Tori", target: 1, current: 0, progress: 0, status: "Red", confidence: 5, quarter: "Q1" },
-            { pillar: "Tech", objective: "Full Group adoption of TTT System", keyResult: "TTT Academy on the system", owner: "Tori", target: 1, current: 0, progress: 0, status: "Red", confidence: 5, quarter: "Q1" },
+            { pillar: "Tech", objective: "Full Group adoption of TTT System", keyResult: "Establish new OPSCO team", owner: "Tori", target: 1, current: 0, progress: 0, status: "Red", confidence: 5, quarter: "Q1" as const },
+            { pillar: "Tech", objective: "Full Group adoption of TTT System", keyResult: "TTT Academy on the system", owner: "Tori", target: 1, current: 0, progress: 0, status: "Red", confidence: 5, quarter: "Q1" as const },
 
             // Tech — AI-powered financial advisory tool (Q1)
-            { pillar: "Tech", objective: "Launch an AI-powered financial advisory tool that increases cross-selling opportunities by 15%", keyResult: "Achieve a 50% adoption rate of self service tools", owner: "Riivo", target: 50, current: 0, progress: 0, status: "Red", confidence: 5, quarter: "Q1" },
-            { pillar: "Tech", objective: "Launch an AI-powered financial advisory tool that increases cross-selling opportunities by 15%", keyResult: "Launch an AI-powered financial advisory tool for clients", owner: "Riivo", target: 1, current: 0, progress: 0, status: "Red", confidence: 5, quarter: "Q1" },
-            { pillar: "Tech", objective: "Launch an AI-powered financial advisory tool that increases cross-selling opportunities by 15%", keyResult: "WhatsApp integration into CRM", owner: "Riivo", target: 1, current: 0, progress: 0, status: "Red", confidence: 5, quarter: "Q1" },
+            { pillar: "Tech", objective: "Launch an AI-powered financial advisory tool that increases cross-selling opportunities by 15%", keyResult: "Achieve a 50% adoption rate of self service tools", owner: "Riivo", target: 50, current: 0, progress: 0, status: "Red", confidence: 5, quarter: "Q1" as const },
+            { pillar: "Tech", objective: "Launch an AI-powered financial advisory tool that increases cross-selling opportunities by 15%", keyResult: "Launch an AI-powered financial advisory tool for clients", owner: "Riivo", target: 1, current: 0, progress: 0, status: "Red", confidence: 5, quarter: "Q1" as const },
+            { pillar: "Tech", objective: "Launch an AI-powered financial advisory tool that increases cross-selling opportunities by 15%", keyResult: "WhatsApp integration into CRM", owner: "Riivo", target: 1, current: 0, progress: 0, status: "Red", confidence: 5, quarter: "Q1" as const },
 
             // Tech — Empower Employees (Q1)
-            { pillar: "Tech", objective: "Empower Employees with Cutting-Edge Tools to Drive Efficiency", keyResult: "TTT System CRM integration across the entire group by Q4", owner: "Riivo", target: 1, current: 0, progress: 0, status: "Red", confidence: 5, quarter: "Q1" },
-            { pillar: "Tech", objective: "Empower Employees with Cutting-Edge Tools to Drive Efficiency", keyResult: "Reduce commission earner compilation time by 80% through the bank statement tool, 100% adoption rate", owner: "Riivo", target: 80, current: 0, progress: 0, status: "Red", confidence: 5, quarter: "Q1" },
-            { pillar: "Tech", objective: "Empower Employees with Cutting-Edge Tools to Drive Efficiency", keyResult: "Reduce client email queries and calls by 50% by Q4", owner: "Riivo", target: 50, current: 0, progress: 0, status: "Red", confidence: 5, quarter: "Q1" },
+            { pillar: "Tech", objective: "Empower Employees with Cutting-Edge Tools to Drive Efficiency", keyResult: "TTT System CRM integration across the entire group by Q4", owner: "Riivo", target: 1, current: 0, progress: 0, status: "Red", confidence: 5, quarter: "Q1" as const },
+            { pillar: "Tech", objective: "Empower Employees with Cutting-Edge Tools to Drive Efficiency", keyResult: "Reduce commission earner compilation time by 80% through the bank statement tool, 100% adoption rate", owner: "Riivo", target: 80, current: 0, progress: 0, status: "Red", confidence: 5, quarter: "Q1" as const },
+            { pillar: "Tech", objective: "Empower Employees with Cutting-Edge Tools to Drive Efficiency", keyResult: "Reduce client email queries and calls by 50% by Q4", owner: "Riivo", target: 50, current: 0, progress: 0, status: "Red", confidence: 5, quarter: "Q1" as const },
 
             // Growth — Growing and motivating the sales team — missing Q1 KR only
-            { pillar: "Growth", objective: "Growing and motivating sales team", keyResult: "Develop BA recruitment and onboarding program", owner: "Cheldeen", target: 1, current: 0, progress: 0, status: "Red", confidence: 5, quarter: "Q1" },
+            { pillar: "Growth", objective: "Growing and motivating sales team", keyResult: "Develop BA recruitment and onboarding program", owner: "Cheldeen", target: 1, current: 0, progress: 0, status: "Red", confidence: 5, quarter: "Q1" as const },
 
             // Growth — Admin Hub (Q1)
-            { pillar: "Growth", objective: "Continue the development of the revolutionary hub & Increase revenue by 100%", keyResult: "Revenue target from marketers", owner: "Tori", target: 1, current: 0, progress: 0, status: "Red", confidence: 5, quarter: "Q1" },
-            { pillar: "Growth", objective: "Continue the development of the revolutionary hub & Increase revenue by 100%", keyResult: "Recruitment", owner: "Tori", target: 1, current: 0, progress: 0, status: "Red", confidence: 5, quarter: "Q1" },
+            { pillar: "Growth", objective: "Continue the development of the revolutionary hub & Increase revenue by 100%", keyResult: "Revenue target from marketers", owner: "Tori", target: 1, current: 0, progress: 0, status: "Red", confidence: 5, quarter: "Q1" as const },
+            { pillar: "Growth", objective: "Continue the development of the revolutionary hub & Increase revenue by 100%", keyResult: "Recruitment", owner: "Tori", target: 1, current: 0, progress: 0, status: "Red", confidence: 5, quarter: "Q1" as const },
 
             // Growth — CT book (Q1)
-            { pillar: "Growth", objective: "Lay the groundwork to reach our team target", keyResult: "Recruitment of 2 Tax Admin", owner: "Sheri", target: 2, current: 0, progress: 0, status: "Red", confidence: 5, quarter: "Q1" },
-            { pillar: "Growth", objective: "Lay the groundwork to reach our team target", keyResult: "Develop team reward system and achieve buy-in", owner: "Sheri", target: 1, current: 0, progress: 0, status: "Red", confidence: 5, quarter: "Q1" },
+            { pillar: "Growth", objective: "Lay the groundwork to reach our team target", keyResult: "Recruitment of 2 Tax Admin", owner: "Sheri", target: 2, current: 0, progress: 0, status: "Red", confidence: 5, quarter: "Q1" as const },
+            { pillar: "Growth", objective: "Lay the groundwork to reach our team target", keyResult: "Develop team reward system and achieve buy-in", owner: "Sheri", target: 1, current: 0, progress: 0, status: "Red", confidence: 5, quarter: "Q1" as const },
 
             // Growth — Accounting (Q1)
-            { pillar: "Growth", objective: "Accelerate revenue sales through alignment", keyResult: "Generate R30k pm revenue through increases on existing base", owner: "James & Kelly", target: 30000, current: 0, progress: 0, status: "Red", confidence: 5, quarter: "Q1" },
-            { pillar: "Growth", objective: "Accelerate revenue sales through alignment", keyResult: "R50k new monthly revenue on sales", owner: "James & Kelly", target: 50000, current: 0, progress: 0, status: "Red", confidence: 5, quarter: "Q1" },
-            { pillar: "Growth", objective: "Accelerate revenue sales through alignment", keyResult: "Recruit 2 new accountants", owner: "James & Kelly", target: 2, current: 0, progress: 0, status: "Red", confidence: 5, quarter: "Q1" },
+            { pillar: "Growth", objective: "Accelerate revenue sales through alignment", keyResult: "Generate R30k pm revenue through increases on existing base", owner: "James & Kelly", target: 30000, current: 0, progress: 0, status: "Red", confidence: 5, quarter: "Q1" as const },
+            { pillar: "Growth", objective: "Accelerate revenue sales through alignment", keyResult: "R50k new monthly revenue on sales", owner: "James & Kelly", target: 50000, current: 0, progress: 0, status: "Red", confidence: 5, quarter: "Q1" as const },
+            { pillar: "Growth", objective: "Accelerate revenue sales through alignment", keyResult: "Recruit 2 new accountants", owner: "James & Kelly", target: 2, current: 0, progress: 0, status: "Red", confidence: 5, quarter: "Q1" as const },
 
             // Growth — Short Term (Q1)
-            { pillar: "Growth", objective: "Transform into a growth focused division", keyResult: "Achieve R28k pm in net revenue growth", owner: "Bran & Netasha", target: 28000, current: 0, progress: 0, status: "Red", confidence: 5, quarter: "Q1" },
-            { pillar: "Growth", objective: "Transform into a growth focused division", keyResult: "Contact and visit 100% of renewals >R5kpm", owner: "Bran & Netasha", target: 100, current: 0, progress: 0, status: "Red", confidence: 5, quarter: "Q1" },
-            { pillar: "Growth", objective: "Transform into a growth focused division", keyResult: "Readjust portfolios and use admin hub appropriately to improve efficiencies", owner: "Bran & Netasha", target: 1, current: 0, progress: 0, status: "Red", confidence: 5, quarter: "Q1" },
-            { pillar: "Growth", objective: "Transform into a growth focused division", keyResult: "Generate 100 leads from FA's", owner: "Bran & Netasha", target: 100, current: 0, progress: 0, status: "Red", confidence: 5, quarter: "Q1" },
-            { pillar: "Growth", objective: "Transform into a growth focused division", keyResult: "Achieve 50% closing ratio on TTT leads", owner: "Bran & Netasha", target: 50, current: 0, progress: 0, status: "Red", confidence: 5, quarter: "Q1" },
+            { pillar: "Growth", objective: "Transform into a growth focused division", keyResult: "Achieve R28k pm in net revenue growth", owner: "Bran & Netasha", target: 28000, current: 0, progress: 0, status: "Red", confidence: 5, quarter: "Q1" as const },
+            { pillar: "Growth", objective: "Transform into a growth focused division", keyResult: "Contact and visit 100% of renewals >R5kpm", owner: "Bran & Netasha", target: 100, current: 0, progress: 0, status: "Red", confidence: 5, quarter: "Q1" as const },
+            { pillar: "Growth", objective: "Transform into a growth focused division", keyResult: "Readjust portfolios and use admin hub appropriately to improve efficiencies", owner: "Bran & Netasha", target: 1, current: 0, progress: 0, status: "Red", confidence: 5, quarter: "Q1" as const },
+            { pillar: "Growth", objective: "Transform into a growth focused division", keyResult: "Generate 100 leads from FA's", owner: "Bran & Netasha", target: 100, current: 0, progress: 0, status: "Red", confidence: 5, quarter: "Q1" as const },
+            { pillar: "Growth", objective: "Transform into a growth focused division", keyResult: "Achieve 50% closing ratio on TTT leads", owner: "Bran & Netasha", target: 50, current: 0, progress: 0, status: "Red", confidence: 5, quarter: "Q1" as const },
 
             // Growth — FA team (Q1)
-            { pillar: "Growth", objective: "Ignite the FA team", keyResult: "Achieve R50k pm average across FA's", owner: "Craig & Andrew", target: 50000, current: 0, progress: 0, status: "Red", confidence: 5, quarter: "Q1" },
-            { pillar: "Growth", objective: "Ignite the FA team", keyResult: "R150m TTT AUM by end of Q1", owner: "Craig & Andrew", target: 150, current: 0, progress: 0, status: "Red", confidence: 5, quarter: "Q1" },
-            { pillar: "Growth", objective: "Ignite the FA team", keyResult: "Document tiered system for ongoing fees", owner: "Craig & Andrew", target: 1, current: 0, progress: 0, status: "Red", confidence: 5, quarter: "Q1" },
-            { pillar: "Growth", objective: "Ignite the FA team", keyResult: "3 new FA's", owner: "Craig & Andrew", target: 3, current: 0, progress: 0, status: "Red", confidence: 5, quarter: "Q1" },
+            { pillar: "Growth", objective: "Ignite the FA team", keyResult: "Achieve R50k pm average across FA's", owner: "Craig & Andrew", target: 50000, current: 0, progress: 0, status: "Red", confidence: 5, quarter: "Q1" as const },
+            { pillar: "Growth", objective: "Ignite the FA team", keyResult: "R150m TTT AUM by end of Q1", owner: "Craig & Andrew", target: 150, current: 0, progress: 0, status: "Red", confidence: 5, quarter: "Q1" as const },
+            { pillar: "Growth", objective: "Ignite the FA team", keyResult: "Document tiered system for ongoing fees", owner: "Craig & Andrew", target: 1, current: 0, progress: 0, status: "Red", confidence: 5, quarter: "Q1" as const },
+            { pillar: "Growth", objective: "Ignite the FA team", keyResult: "3 new FA's", owner: "Craig & Andrew", target: 3, current: 0, progress: 0, status: "Red", confidence: 5, quarter: "Q1" as const },
 
             // Diversification — Infiltrate real estate (Q1)
-            { pillar: "Diversification", objective: "Infiltrate real estate industry", keyResult: "150 clients on fixed pricing", owner: undefined, target: 150, current: 0, progress: 0, status: "Red", confidence: 5, quarter: "Q1" },
+            { pillar: "Diversification", objective: "Infiltrate real estate industry", keyResult: "150 clients on fixed pricing", owner: undefined, target: 150, current: 0, progress: 0, status: "Red", confidence: 5, quarter: "Q1" as const },
 
             // Diversification — Deeper financial clarity (Q1)
-            { pillar: "Diversification", objective: "Providing deeper financial clarity to existing tax base", keyResult: "5% of TTT clients with 2 products by end of Q4", owner: undefined, target: 5, current: 0, progress: 0, status: "Red", confidence: 5, quarter: "Q1" },
+            { pillar: "Diversification", objective: "Providing deeper financial clarity to existing tax base", keyResult: "5% of TTT clients with 2 products by end of Q4", owner: undefined, target: 5, current: 0, progress: 0, status: "Red", confidence: 5, quarter: "Q1" as const },
 
             // Culture — Foster culture (Q1)
-            { pillar: "Culture", objective: "Foster a culture of productivity, respect, improvement and transformation", keyResult: "Staff retention of 90%", owner: undefined, target: 90, current: 0, progress: 0, status: "Red", confidence: 5, quarter: "Q1" },
-            { pillar: "Culture", objective: "Foster a culture of productivity, respect, improvement and transformation", keyResult: "Ongoing training and CPD", owner: undefined, target: 1, current: 0, progress: 0, status: "Red", confidence: 5, quarter: "Q1" },
-            { pillar: "Culture", objective: "Foster a culture of productivity, respect, improvement and transformation", keyResult: "Study offering available to staff", owner: undefined, target: 1, current: 0, progress: 0, status: "Red", confidence: 5, quarter: "Q1" },
-            { pillar: "Culture", objective: "Foster a culture of productivity, respect, improvement and transformation", keyResult: "Health and wellness activities on offer", owner: undefined, target: 1, current: 0, progress: 0, status: "Red", confidence: 5, quarter: "Q1" },
+            { pillar: "Culture", objective: "Foster a culture of productivity, respect, improvement and transformation", keyResult: "Staff retention of 90%", owner: undefined, target: 90, current: 0, progress: 0, status: "Red", confidence: 5, quarter: "Q1" as const },
+            { pillar: "Culture", objective: "Foster a culture of productivity, respect, improvement and transformation", keyResult: "Ongoing training and CPD", owner: undefined, target: 1, current: 0, progress: 0, status: "Red", confidence: 5, quarter: "Q1" as const },
+            { pillar: "Culture", objective: "Foster a culture of productivity, respect, improvement and transformation", keyResult: "Study offering available to staff", owner: undefined, target: 1, current: 0, progress: 0, status: "Red", confidence: 5, quarter: "Q1" as const },
+            { pillar: "Culture", objective: "Foster a culture of productivity, respect, improvement and transformation", keyResult: "Health and wellness activities on offer", owner: undefined, target: 1, current: 0, progress: 0, status: "Red", confidence: 5, quarter: "Q1" as const },
 
             // Culture — Share incentive scheme (Q1)
-            { pillar: "Culture", objective: "Establish Employee Share Incentive Scheme", keyResult: "100% of managers to invest in management share scheme", owner: undefined, target: 100, current: 0, progress: 0, status: "Red", confidence: 5, quarter: "Q1" },
+            { pillar: "Culture", objective: "Establish Employee Share Incentive Scheme", keyResult: "100% of managers to invest in management share scheme", owner: undefined, target: 100, current: 0, progress: 0, status: "Red", confidence: 5, quarter: "Q1" as const },
 
             // Brand (Q1)
-            { pillar: "Brand", objective: "Support the Transformation of TTT by expanding the reach and strength of the brand", keyResult: "Achieve 35,000 followers across all social media platforms", owner: undefined, target: 35000, current: 0, progress: 0, status: "Red", confidence: 5, quarter: "Q1" },
-            { pillar: "Brand", objective: "Support the Transformation of TTT by expanding the reach and strength of the brand", keyResult: "Generate revenue through direct marketing efforts", owner: undefined, target: 1, current: 0, progress: 0, status: "Red", confidence: 5, quarter: "Q1" },
+            { pillar: "Brand", objective: "Support the Transformation of TTT by expanding the reach and strength of the brand", keyResult: "Achieve 35,000 followers across all social media platforms", owner: undefined, target: 35000, current: 0, progress: 0, status: "Red", confidence: 5, quarter: "Q1" as const },
+            { pillar: "Brand", objective: "Support the Transformation of TTT by expanding the reach and strength of the brand", keyResult: "Generate revenue through direct marketing efforts", owner: undefined, target: 1, current: 0, progress: 0, status: "Red", confidence: 5, quarter: "Q1" as const },
         ];
         for (const kr of keyResults) {
             await ctx.db.insert("okrKeyResults", kr);
         }
 
         await ctx.db.insert("appMetadata", { key: "okrFullSeedV1", value: "done" });
+    },
+});
+
+// ─── Quarter Helpers ────────────────────────────────────────────────────────
+
+const QUARTERS = ["Q1", "Q2", "Q3", "Q4"] as const;
+type Quarter = (typeof QUARTERS)[number];
+
+/** Derive the active quarter from a Date (standard calendar boundaries). */
+function getActiveQuarter(date: Date = new Date()): Quarter {
+    const month = date.getMonth(); // 0-indexed
+    if (month <= 2) return "Q1";
+    if (month <= 5) return "Q2";
+    if (month <= 8) return "Q3";
+    return "Q4";
+}
+
+/** Return the end date of a quarter as a Date. */
+function getQuarterEndDate(quarter: Quarter, year: number = new Date().getFullYear()): Date {
+    const ends: Record<Quarter, [number, number]> = {
+        Q1: [2, 31], // Mar 31
+        Q2: [5, 30], // Jun 30
+        Q3: [8, 30], // Sep 30
+        Q4: [11, 31], // Dec 31
+    };
+    const [month, day] = ends[quarter];
+    return new Date(year, month, day, 23, 59, 59);
+}
+
+/** Weeks remaining until the end of the given quarter. */
+function weeksRemainingInQuarter(quarter: Quarter, now: Date = new Date()): number {
+    const end = getQuarterEndDate(quarter, now.getFullYear());
+    const diff = end.getTime() - now.getTime();
+    return Math.max(0, diff / (7 * 24 * 60 * 60 * 1000));
+}
+
+export const activeQuarter = query({
+    args: {},
+    handler: async () => {
+        return getActiveQuarter();
     },
 });
 
@@ -289,7 +329,8 @@ export const updateKeyResult = mutation({
         progress: v.optional(v.number()),
         status: v.optional(v.string()),
         confidence: v.optional(v.number()),
-        quarter: v.optional(v.string()),
+        quarter: v.optional(v.union(v.literal("Q1"), v.literal("Q2"), v.literal("Q3"), v.literal("Q4"))),
+        targetValue: v.optional(v.number()),
         thresholdAmber: v.optional(v.number()),
         thresholdGreen: v.optional(v.number()),
     },
@@ -313,6 +354,7 @@ export const updateKeyResult = mutation({
         if (fields.progress !== undefined) updates.progress = fields.progress;
         if (fields.confidence !== undefined) updates.confidence = fields.confidence;
         if (fields.quarter !== undefined) updates.quarter = fields.quarter;
+        if (fields.targetValue !== undefined) updates.targetValue = fields.targetValue;
         if (fields.thresholdAmber !== undefined) updates.thresholdAmber = fields.thresholdAmber;
         if (fields.thresholdGreen !== undefined) updates.thresholdGreen = fields.thresholdGreen;
         updates.status = resolvedStatus;
@@ -332,7 +374,8 @@ export const addKeyResult = mutation({
         progress: v.number(),
         status: v.string(),
         confidence: v.number(),
-        quarter: v.optional(v.string()),
+        quarter: v.optional(v.union(v.literal("Q1"), v.literal("Q2"), v.literal("Q3"), v.literal("Q4"))),
+        targetValue: v.optional(v.number()),
         thresholdAmber: v.optional(v.number()),
         thresholdGreen: v.optional(v.number()),
     },
@@ -348,7 +391,7 @@ export const migrateAnnualToQ1 = mutation({
     handler: async (ctx) => {
         await requireAdmin(ctx);
         const allKRs = await ctx.db.query("okrKeyResults").collect();
-        const annualKRs = allKRs.filter((kr) => kr.quarter === "Annual" || !kr.quarter);
+        const annualKRs = allKRs.filter((kr) => (kr.quarter as string) === "Annual" || !kr.quarter);
         for (const kr of annualKRs) {
             await ctx.db.patch(kr._id, { quarter: "Q1" });
         }

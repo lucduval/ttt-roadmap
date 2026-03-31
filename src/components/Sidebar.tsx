@@ -117,7 +117,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeView, setActiveView, isOpen, on
                     />
                     <NavItem
                         icon={<ListChecks className="w-5 h-5" />}
-                        label="Q1 Key Results"
+                        label="Key Results"
                         active={activeView === 'okr-q1'}
                         onClick={() => handleNavClick('okr-q1')}
                     />
