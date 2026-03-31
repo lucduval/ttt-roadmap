@@ -8,11 +8,18 @@ interface OKRProgressBarProps {
     target?: number;
     thresholdAmber?: number;
     thresholdGreen?: number;
+    status?: 'Green' | 'Amber' | 'Red';
 }
 
 function getProgressColor(progress: number): string {
     if (progress >= 0.7) return 'bg-emerald-500';
     if (progress >= 0.4) return 'bg-amber-400';
+    return 'bg-rose-500';
+}
+
+function getStatusColor(status: 'Green' | 'Amber' | 'Red'): string {
+    if (status === 'Green') return 'bg-emerald-500';
+    if (status === 'Amber') return 'bg-amber-400';
     return 'bg-rose-500';
 }
 
@@ -23,9 +30,10 @@ const OKRProgressBar: React.FC<OKRProgressBarProps> = ({
     target,
     thresholdAmber,
     thresholdGreen,
+    status,
 }) => {
     const pct = Math.min(Math.max(progress * 100, 0), 100);
-    const color = getProgressColor(progress);
+    const color = status ? getStatusColor(status) : getProgressColor(progress);
 
     const heightClass = {
         sm: 'h-1.5',

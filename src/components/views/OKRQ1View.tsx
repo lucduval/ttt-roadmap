@@ -241,6 +241,7 @@ const OKRQ1View: React.FC<OKRQ1ViewProps> = ({ keyResults, onEdit, onAdd }) => {
                                                         target={kr.target}
                                                         thresholdAmber={kr.thresholdAmber}
                                                         thresholdGreen={kr.thresholdGreen}
+                                                        status={kr.status}
                                                     />
                                                 </div>
 
