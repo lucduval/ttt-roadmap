@@ -105,6 +105,7 @@ export default defineSchema({
         fullName: v.string(),
         email: v.optional(v.string()),
         department: v.optional(v.string()),
+        jobTitle: v.optional(v.string()),
         isDisabled: v.boolean(),
         lastActiveOn: v.optional(v.string()), // ISO date from Dynamics lastactivedon
         lastSyncedAt: v.number(),
@@ -116,6 +117,17 @@ export default defineSchema({
         count: v.number(),
         syncedAt: v.number(),
     }).index("by_user_entity", ["dynamicsUserId", "entityType"]),
+
+    // Milestone tracking for training / one-off goals
+    milestones: defineTable({
+        key: v.string(),          // unique key e.g. "q1_tax_ba_training"
+        label: v.string(),        // display label
+        role: v.string(),         // role this milestone belongs to
+        quarter: v.string(),      // "Q1" | "Q2" | "Q3" | "Q4"
+        completed: v.boolean(),
+        completedAt: v.optional(v.number()),
+        completedBy: v.optional(v.string()),
+    }).index("by_key", ["key"]).index("by_quarter", ["quarter"]),
 
     opportunityData: defineTable({
         opportunityId: v.string(),  // riivo_opportunityid

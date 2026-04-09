@@ -94,7 +94,9 @@ export const seed = mutation({
             baseGoal: v.optional(v.string()),
             targetGoal: v.optional(v.string()),
             stretchGoal: v.optional(v.string()),
+            currentValue: v.optional(v.number()),
             quarterlyTargets: quarterlyTargetValidator,
+            metricDefinitions: metricDefinitionsValidator,
         }))
     },
     handler: async (ctx, args) => {

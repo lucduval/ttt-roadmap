@@ -75,7 +75,14 @@ export async function POST(request: Request) {
 
     if (!isValidCron) {
         const { sessionClaims } = await auth();
-        const role = (sessionClaims as Record<string, unknown> | null)?.role;
+        const claims = sessionClaims as Record<string, unknown> | null;
+        // Clerk exposes publicMetadata in session claims under "metadata" or
+        // at the top level if a custom JWT template maps it (e.g. "role": "{{user.public_metadata.role}}")
+        const role =
+            claims?.role ??
+            (claims?.metadata as Record<string, unknown> | undefined)?.role ??
+            (claims?.publicMetadata as Record<string, unknown> | undefined)?.role ??
+            (claims?.public_metadata as Record<string, unknown> | undefined)?.role;
         if (role !== "admin") {
             return NextResponse.json({ error: "Forbidden: admin access required" }, { status: 403 });
         }
@@ -128,7 +135,7 @@ export async function POST(request: Request) {
         // 1. Fetch all active CRM users
         const usersJson = await dynamicsRequest(
             `${baseUrl}/api/data/v9.2/systemusers` +
-            `?$select=systemuserid,fullname,internalemailaddress,isdisabled` +
+            `?$select=systemuserid,fullname,internalemailaddress,isdisabled,jobtitle` +
             `&$filter=isdisabled eq false` +
             `&$top=250`,
             headers
@@ -151,6 +158,7 @@ export async function POST(request: Request) {
             { endpoint: "new_leads", label: "leads" },
             { endpoint: "contacts", label: "contacts" },
             { endpoint: "new_invoiceses", label: "invoices" },
+            { endpoint: "opportunities", label: "opportunities" },
         ];
 
         const activityCounts: Record<string, Record<string, number>> = {};
@@ -176,6 +184,33 @@ export async function POST(request: Request) {
             }
         }
 
+        // Count OTP tasks per user (tasks whose subject contains "OTP", attributed to primary representative)
+        try {
+            const otpJson = await dynamicsRequest(
+                `${baseUrl}/api/data/v9.2/tasks` +
+                `?$select=subject,_riivo_primaryrepresentative_value,createdon` +
+                `&$filter=createdon ge ${since} and contains(subject,'OTP')` +
+                `&$top=5000`,
+                headers
+            );
+            const otpRecords = ((otpJson.value ?? []) as Record<string, unknown>[]);
+            for (const r of otpRecords) {
+                // Check time-of-day filter (10am–3pm) to avoid bulk upload bias
+                const createdOn = r["createdon"] as string | undefined;
+                if (createdOn) {
+                    const hour = new Date(createdOn).getHours();
+                    if (hour < 10 || hour >= 15) continue;
+                }
+
+                const uid = r["_riivo_primaryrepresentative_value"] as string;
+                if (!uid) continue;
+                if (!activityCounts[uid]) activityCounts[uid] = {};
+                activityCounts[uid]["otpTasks"] = (activityCounts[uid]["otpTasks"] ?? 0) + 1;
+            }
+        } catch {
+            // OTP task query may fail if entity doesn't exist — skip gracefully
+        }
+
         const syncedAt = Date.now();
 
         // Write results to Convex
@@ -186,6 +221,7 @@ export async function POST(request: Request) {
                 fullName: (u.fullname as string) ?? "Unknown",
                 email: (u.internalemailaddress as string | undefined) ?? undefined,
                 department: (u.department as string | undefined) ?? undefined,
+                jobTitle: (u.jobtitle as string | undefined) ?? undefined,
                 isDisabled: (u.isdisabled as boolean) ?? false,
                 lastActiveOn: (u.lastactivedon as string | undefined) ?? undefined,
                 lastSyncedAt: syncedAt,

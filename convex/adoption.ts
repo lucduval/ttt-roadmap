@@ -1,5 +1,6 @@
 import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
+import { requireAdmin } from "./lib/auth";
 
 // ── Opportunities ────────────────────────────────────────────────────────────
 
@@ -68,6 +69,7 @@ export const upsertAdoptionData = mutation({
                 fullName: v.string(),
                 email: v.optional(v.string()),
                 department: v.optional(v.string()),
+                jobTitle: v.optional(v.string()),
                 isDisabled: v.boolean(),
                 lastActiveOn: v.optional(v.string()),
                 lastSyncedAt: v.number(),
@@ -133,5 +135,54 @@ export const getAdoptionData = query({
             })),
             lastSyncedAt,
         };
+    },
+});
+
+// ── Milestones ──────────────────────────────────────────────────────────────
+
+export const getMilestones = query({
+    args: {},
+    handler: async (ctx) => {
+        return await ctx.db.query("milestones").collect();
+    },
+});
+
+export const seedMilestones = mutation({
+    args: {
+        milestones: v.array(
+            v.object({
+                key: v.string(),
+                label: v.string(),
+                role: v.string(),
+                quarter: v.string(),
+                completed: v.boolean(),
+            })
+        ),
+    },
+    handler: async (ctx, { milestones }) => {
+        await requireAdmin(ctx);
+        for (const m of milestones) {
+            const existing = await ctx.db
+                .query("milestones")
+                .withIndex("by_key", (q) => q.eq("key", m.key))
+                .first();
+            if (!existing) {
+                await ctx.db.insert("milestones", m);
+            }
+        }
+    },
+});
+
+export const toggleMilestone = mutation({
+    args: {
+        id: v.id("milestones"),
+        completed: v.boolean(),
+    },
+    handler: async (ctx, { id, completed }) => {
+        await requireAdmin(ctx);
+        await ctx.db.patch(id, {
+            completed,
+            completedAt: completed ? Date.now() : undefined,
+        });
     },
 });
